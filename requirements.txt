@@ -1,7 +1,5 @@
 gradio~=5.50.0
 langchain-community~=0.4.1
 python-dotenv~=1.2.1
-openai-whisper~=20250625
-gtts~=2.5.4
 langchain-core~=1.2.4
 langchain-text-splitters~=1.1.0
