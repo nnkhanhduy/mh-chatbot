@@ -1,0 +1,14 @@
+.gradio-container {
+    max-width: 900px !important;
+    margin: auto;
+}
+
+.message.user {
+    background: #d1fae5 !important;
+    border-radius: 16px !important;
+}
+
+.message.bot {
+    background: #f0f9ff !important;
+    border-radius: 16px !important;
+}
