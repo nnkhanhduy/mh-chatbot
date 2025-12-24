@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This project is a Retrieval-Augmented Generation (RAG) based mental health chatbot.  
-The system retrieves relevant information from PDF documents and uses a large language model to generate context-aware and supportive responses.  
-The chatbot is intended for informational and supportive use only and does not replace professional mental health services.
+This project implements a Retrieval-Augmented Generation (RAG) based mental health chatbot designed to provide supportive and context-aware responses.
+The system retrieves relevant information from curated PDF documents and combines it with a large language model for both text and voice interactions.
+This chatbot is intended solely for informational and emotional support and is not a substitute for professional mental health care.
 
 ## Installation
 
@@ -35,5 +35,6 @@ python main.py
 - **HuggingFace Sentence Transformers** – Text embedding generation  
 - **ChromaDB** – Vector database for semantic search and retrieval  
 - **Gradio** – Web-based interface for interactive chatbot deployment  
-
+- **Whisper** - Speech-to-text for voice input
+- **gTTS** - Text-to-speech for voice output
 

@@ -4,7 +4,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 
 def create_vector_db():
-    loader = DirectoryLoader("data/", glob="*.pdf", loader_cls=PyPDFLoader)
+    loader = DirectoryLoader("../data/", glob="*.pdf", loader_cls=PyPDFLoader)
 
     documents = loader.load()
     print(f"Loaded {len(documents)} documents")

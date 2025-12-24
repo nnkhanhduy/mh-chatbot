@@ -3,3 +3,6 @@ langchain-community~=0.4.1
 python-dotenv~=1.2.1
 langchain-core~=1.2.4
 langchain-text-splitters~=1.1.0
+gTTS
+openai-whisper
+
