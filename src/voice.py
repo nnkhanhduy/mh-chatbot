@@ -3,7 +3,6 @@ from gtts import gTTS
 import uuid
 import os
 
-print("🔊 Loading Whisper model...")
 whisper_model = whisper.load_model("tiny")
 
 def speech_to_text(audio_path: str) -> str:

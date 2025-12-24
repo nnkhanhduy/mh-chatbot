@@ -61,10 +61,10 @@ custom_theme = gr.themes.Soft(
 custom_css = load_css("styles/chatbot.css")
 
 with gr.Blocks(css=custom_css) as app:
-    gr.Markdown("## 🧠 Mental Health Chatbot")
-    gr.Markdown("🌿 A calm space to talk, reflect, and heal")
+    gr.Markdown("## Mental Health Chatbot")
+    gr.Markdown("A calm space to talk, reflect, and heal")
 
-    with gr.Tab("💬 Text Chat"):
+    with gr.Tab("Text Chat"):
         chatbot = gr.Chatbot(height=400)
 
         msg = gr.Textbox(
@@ -83,7 +83,7 @@ with gr.Blocks(css=custom_css) as app:
             outputs=[msg, chatbot]
         )
 
-    with gr.Tab("🎧 Voice Chat"):
+    with gr.Tab("Voice Chat"):
         mic = gr.Audio(
             sources=["microphone"],
             type="filepath",
