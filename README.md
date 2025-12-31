@@ -50,6 +50,12 @@ Create a `.env` file in the root directory and add your Groq API key:
 GROQ_API_KEY=your_groq_api_key_here
 ```
 
+> [!NOTE]
+> **System Dependency**: For Voice Chat (Whisper), you may need to install **ffmpeg** on your system.
+> - **Windows**: `choco install ffmpeg`
+> - **macOS**: `brew install ffmpeg`
+> - **Linux**: `sudo apt install ffmpeg`
+
 ### 4. Run the Application
 ```bash
 python main.py
