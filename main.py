@@ -45,7 +45,7 @@ def format_history(history):
 
 def voice_chat(audio_path, history):
     if audio_path is None:
-        return "No audio", "No audio", None, history
+        return None, history, None
 
     user_text = speech_to_text(audio_path)
     
@@ -62,7 +62,8 @@ def voice_chat(audio_path, history):
     
     history.append((user_text, answer_text))
 
-    return user_text, answer_text, answer_audio, history
+    # Return bot_audio first to trigger autoplay, then the updated history for the chatbot
+    return answer_audio, history, user_text
 
 def chatbot_response(message, history):
     history_str = format_history(history)
@@ -82,8 +83,8 @@ custom_theme = gr.themes.Soft(
 custom_css = load_css("styles/chatbot.css")
 
 with gr.Blocks(theme=custom_theme, css=custom_css, title="Mental Health AI") as app:
-    # State to keep track of history for Voice Chat (Text Chat handles it automatically via Chatbot component)
-    voice_history = gr.State([])
+    # Shared history state for both tabs to stay in sync
+    shared_history = gr.State([])
 
     with gr.Column(elem_id="header", variant="panel"):
         gr.Markdown("# 🌿 Mental Health Chatbot")
@@ -110,9 +111,7 @@ with gr.Blocks(theme=custom_theme, css=custom_css, title="Mental Health AI") as 
                 if not message.strip():
                     return "", chat_history
                 
-                # Format history for the chain
                 history_str = format_history(chat_history)
-                
                 response = qa_chain.invoke({
                     "question": message,
                     "chat_history": history_str
@@ -123,34 +122,58 @@ with gr.Blocks(theme=custom_theme, css=custom_css, title="Mental Health AI") as 
 
             msg.submit(
                 respond,
-                inputs=[msg, chatbot],
+                inputs=[msg, shared_history],
                 outputs=[msg, chatbot]
             )
             submit_btn.click(
                 respond,
-                inputs=[msg, chatbot],
+                inputs=[msg, shared_history],
                 outputs=[msg, chatbot]
             )
 
         with gr.Tab("🎙️ Voice Chat"):
             with gr.Row(elem_classes=["voice-row"]):
                 with gr.Column(scale=1):
-                    gr.Markdown("### Input")
+                    gr.Markdown("### 🎤 Voice Input")
                     mic = gr.Audio(
                         sources=["microphone"],
                         type="filepath",
-                        label="Click to Speak",
+                        label="Click to start talking",
+                        elem_id="voice-mic"
                     )
-                with gr.Column(scale=2):
-                    gr.Markdown("### Conversation")
-                    user_text = gr.Textbox(label="You said", interactive=False)
-                    bot_text = gr.Textbox(label="Bot response", interactive=False)
-                    bot_audio = gr.Audio(label="Bot voice", autoplay=True)
+                    
+                    stt_output = gr.Textbox(label="You said", interactive=False)
+                    # Invisible component to trigger autoplay
+                    bot_audio_playback = gr.Audio(
+                        label="Bot response", 
+                        autoplay=True, 
+                        # visible=False
+                    )
 
-            mic.change(
+                with gr.Column(scale=2):
+                    voice_chatbot = gr.Chatbot(
+                        height=500,
+                        show_label=False,
+                        bubble_full_width=False,
+                        elem_classes=["chatbot-container"]
+                    )
+
+            mic.stop_recording(
                 fn=voice_chat,
-                inputs=[mic, voice_history],
-                outputs=[user_text, bot_text, bot_audio, voice_history]
+                inputs=[mic, shared_history],
+                outputs=[bot_audio_playback, voice_chatbot, stt_output]
+            )
+            
+            # Sync the chatbot on both tabs when history changes
+            shared_history.change(
+                fn=lambda x: x,
+                inputs=[shared_history],
+                outputs=[chatbot]
+            )
+            shared_history.change(
+                fn=lambda x: x,
+                inputs=[shared_history],
+                outputs=[voice_chatbot]
             )
 
     gr.Markdown("---")

@@ -18,7 +18,7 @@
 /* Chatbot container improvements */
 .chatbot-container {
     border-radius: 12px !important;
-    border: 1px solid rgba(0,0,0,0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     background: rgba(255, 255, 255, 0.6) !important;
     backdrop-filter: blur(10px);
 }
@@ -39,7 +39,7 @@
     padding: 12px 16px !important;
     margin-right: 20% !important;
     box-shadow: var(--shadow);
-    border: 1px solid rgba(0,0,0,0.02);
+    border: 1px solid rgba(0, 0, 0, 0.02);
     color: var(--text-main) !important;
 }
 
@@ -82,8 +82,15 @@ input[type="text"]:focus {
 
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .message {
@@ -92,9 +99,34 @@ input[type="text"]:focus {
 
 /* Voice Tab specific */
 .voice-row {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 24px;
     box-shadow: var(--shadow);
-    gap: 20px;
+    gap: 30px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    margin-top: 10px;
+}
+
+#voice-mic {
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    background: #f8fafc;
+    transition: all 0.3s;
+}
+
+#voice-mic:hover {
+    box-shadow: 0 0 15px rgba(94, 234, 212, 0.3);
+}
+
+/* Make Chatbot in Voice tab look integrated */
+.voice-row .chatbot-container {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Subtle pulse for the mic when active (Gradio adds classes, but we can't easily detect 'recording' via pure CSS without JS, so we add a hover indicator) */
+#voice-mic:active {
+    transform: scale(0.98);
 }

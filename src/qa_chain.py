@@ -9,7 +9,6 @@ def setup_qa_chain(vector_db, llm):
 
     prompt = PromptTemplate(
         template="""You are a mental health support chatbot.
-
 Your role is to provide emotional support, validation, and gentle guidance.
 You are not a therapist or doctor.
 
