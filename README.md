@@ -31,7 +31,7 @@ A modern, empathetic, and context-aware mental health support chatbot. Built usi
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the repository
 ```bash
@@ -57,7 +57,7 @@ python main.py
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 ├── chroma_db/      # Persisted vector database
