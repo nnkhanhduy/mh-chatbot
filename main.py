@@ -35,70 +35,126 @@ qa_chain = setup_qa_chain(vector_db, llm)
 
 print("Chatbot ready!")
 
-def voice_chat(audio_path):
-    print("DEBUG audio_path:", audio_path)
+def format_history(history):
+    if not history:
+        return "No previous conversation."
+    formatted_str = ""
+    for user_msg, bot_msg in history:
+        formatted_str += f"User: {user_msg}\nChatbot: {bot_msg}\n"
+    return formatted_str
 
+def voice_chat(audio_path, history):
     if audio_path is None:
-        return "No audio", "No audio", None
+        return "No audio", "No audio", None, history
 
     user_text = speech_to_text(audio_path)
-    response = qa_chain.invoke(user_text)
+    
+    # Format history for the chain
+    history_str = format_history(history)
+    
+    response = qa_chain.invoke({
+        "question": user_text,
+        "chat_history": history_str
+    })
+    
     answer_text = response.content
     answer_audio = text_to_speech(answer_text)
+    
+    history.append((user_text, answer_text))
 
-    return user_text, answer_text, answer_audio
+    return user_text, answer_text, answer_audio, history
 
 def chatbot_response(message, history):
-    response = qa_chain.invoke(message)
+    history_str = format_history(history)
+    response = qa_chain.invoke({
+        "question": message,
+        "chat_history": history_str
+    })
     return response.content
 
 custom_theme = gr.themes.Soft(
     primary_hue="teal",
-    secondary_hue="sky",
-    font=[gr.themes.GoogleFont("Inter")]
+    secondary_hue="slate",
+    neutral_hue="gray",
+    font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui"],
 )
 
 custom_css = load_css("styles/chatbot.css")
 
-with gr.Blocks(css=custom_css) as app:
-    gr.Markdown("## Mental Health Chatbot")
-    gr.Markdown("A calm space to talk, reflect, and heal")
+with gr.Blocks(theme=custom_theme, css=custom_css, title="Mental Health AI") as app:
+    # State to keep track of history for Voice Chat (Text Chat handles it automatically via Chatbot component)
+    voice_history = gr.State([])
 
-    with gr.Tab("Text Chat"):
-        chatbot = gr.Chatbot(height=400)
+    with gr.Column(elem_id="header", variant="panel"):
+        gr.Markdown("# 🌿 Mental Health Chatbot")
+        gr.Markdown("A calm space to talk, reflect, and heal. *Your privacy is our priority.*")
 
-        msg = gr.Textbox(
-            placeholder="Type your thoughts here...",
-            show_label=False
-        )
+    with gr.Tabs():
+        with gr.Tab("💬 Text Chat"):
+            chatbot = gr.Chatbot(
+                height=500,
+                show_label=False,
+                bubble_full_width=False,
+                elem_classes=["chatbot-container"]
+            )
 
-        def respond(message, chat_history):
-            response = qa_chain.invoke(message)
-            chat_history.append((message, response.content))
-            return "", chat_history
+            with gr.Row():
+                msg = gr.Textbox(
+                    placeholder="Type your thoughts here...",
+                    show_label=False,
+                    scale=9
+                )
+                submit_btn = gr.Button("Send", variant="primary", scale=1)
 
-        msg.submit(
-            respond,
-            inputs=[msg, chatbot],
-            outputs=[msg, chatbot]
-        )
+            def respond(message, chat_history):
+                if not message.strip():
+                    return "", chat_history
+                
+                # Format history for the chain
+                history_str = format_history(chat_history)
+                
+                response = qa_chain.invoke({
+                    "question": message,
+                    "chat_history": history_str
+                })
+                
+                chat_history.append((message, response.content))
+                return "", chat_history
 
-    with gr.Tab("Voice Chat"):
-        mic = gr.Audio(
-            sources=["microphone"],
-            type="filepath",
-            label="Speak here",
-        )
+            msg.submit(
+                respond,
+                inputs=[msg, chatbot],
+                outputs=[msg, chatbot]
+            )
+            submit_btn.click(
+                respond,
+                inputs=[msg, chatbot],
+                outputs=[msg, chatbot]
+            )
 
-        user_text = gr.Textbox(label="You said")
-        bot_text = gr.Textbox(label="Bot response")
-        bot_audio = gr.Audio(label="Bot voice")
+        with gr.Tab("🎙️ Voice Chat"):
+            with gr.Row(elem_classes=["voice-row"]):
+                with gr.Column(scale=1):
+                    gr.Markdown("### Input")
+                    mic = gr.Audio(
+                        sources=["microphone"],
+                        type="filepath",
+                        label="Click to Speak",
+                    )
+                with gr.Column(scale=2):
+                    gr.Markdown("### Conversation")
+                    user_text = gr.Textbox(label="You said", interactive=False)
+                    bot_text = gr.Textbox(label="Bot response", interactive=False)
+                    bot_audio = gr.Audio(label="Bot voice", autoplay=True)
 
-        mic.change(
-            fn=voice_chat,
-            inputs=mic,
-            outputs=[user_text, bot_text, bot_audio]
-        )
+            mic.change(
+                fn=voice_chat,
+                inputs=[mic, voice_history],
+                outputs=[user_text, bot_text, bot_audio, voice_history]
+            )
+
+    gr.Markdown("---")
+    gr.Markdown("⚠️ *Disclaimer: This chatbot is for emotional support only. If you are in crisis, please contact local emergency services.*")
 
 app.launch()
 

@@ -28,18 +28,22 @@ answer briefly and steer back to emotional well-being.
 
 If you do not know something, say so gently.
 
-Context:
+Current Conversation:
+{chat_history}
+
+Relevant Context:
 {context}
 
 User: {question}
 Chatbot:""",
-        input_variables=["context", "question"]
+        input_variables=["chat_history", "context", "question"]
     )
 
     chain = (
         {
-            "context": retriever | RunnableLambda(format_docs),
-            "question": RunnablePassthrough()
+            "context": (lambda x: x["question"]) | retriever | RunnableLambda(format_docs),
+            "chat_history": lambda x: x["chat_history"],
+            "question": lambda x: x["question"]
         }
         | prompt
         | llm
