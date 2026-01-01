@@ -180,5 +180,3 @@ with gr.Blocks(theme=custom_theme, css=custom_css, title="Mental Health AI") as 
     gr.Markdown("⚠️ *Disclaimer: This chatbot is for emotional support only. If you are in crisis, please contact local emergency services.*")
 
 app.launch()
-
-
